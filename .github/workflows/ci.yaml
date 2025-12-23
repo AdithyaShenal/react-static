@@ -22,9 +22,9 @@ jobs:
 
   deploy:
     name: Deploy to Elastic Beanstalk
-    needs: test # Fixed: Changed from 'build-and-test' to 'test'
+    needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Only deploy on main branch pushes
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - name: Checkout code
@@ -45,12 +45,8 @@ jobs:
       - name: Verify EB CLI installation
         run: eb --version
 
-      - name: Create deployment package
-        run: |
-          zip -r react-static.zip . -x "*.git*" -x "*node_modules*" -x "*.github*"
-
       - name: Deploy to Elastic Beanstalk
         run: |
           eb init react-static --platform "Docker" --region us-east-1
           eb use React-static-env
-          eb deploy
+          eb deploy --staged
