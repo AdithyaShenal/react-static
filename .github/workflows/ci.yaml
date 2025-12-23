@@ -22,17 +22,13 @@ jobs:
 
   deploy:
     name: Deploy to Elastic Beanstalk
-    needs: build-and-test
+    needs: test # Fixed: Changed from 'build-and-test' to 'test'
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Only deploy on main branch pushes
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install EB CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          pip3 install --upgrade awsebcli
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -41,9 +37,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Install EB CLI
+        run: |
+          pip3 install --user awsebcli
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Verify EB CLI installation
+        run: eb --version
+
+      - name: Create deployment package
+        run: |
+          zip -r react-static.zip . -x "*.git*" -x "*node_modules*" -x "*.github*"
+
       - name: Deploy to Elastic Beanstalk
         run: |
-          zip -r react-static.zip . 
           eb init react-static --platform "Docker" --region us-east-1
           eb use React-static-env
           eb deploy
