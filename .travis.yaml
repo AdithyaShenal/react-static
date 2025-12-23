@@ -8,3 +8,16 @@ before_install:
 # if returned any number other than 0, then consider as test failed
 script:
   - docker run adithyashenal/react-static npm run test # for me no need -- --coverage
+
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-1"
+  app: "react-static" # i cannot find the name as i remeber this
+  env: "React-static-env"
+  bucket_name: "elasticbeanstalk-us-east-1-584949096483" # Travis then put all code to S3 bucket
+  bucket_path: react-static # folder name inside S3 (name is exactly project name)
+  on:
+    branch: main
+  access_key_id: $AWS_ACCESS_KEY_
+  secret_access_key:
+    secure: "$AWS_SECRET_KEY"

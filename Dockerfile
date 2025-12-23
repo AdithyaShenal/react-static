@@ -16,5 +16,5 @@ RUN npm run build
 # The folder that we want is "dist"
 
 FROM nginx:alpine3.23
-
+EXPOSE 80
 COPY --from=builder /app/dist /usr/share/nginx/html
