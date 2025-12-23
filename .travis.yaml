@@ -1,0 +1,10 @@
+sudo: required # Hey travis please give us super user level permission to execute this build
+services: # Hey travis we need a copy of docker ready to go
+  - docker
+
+before_install:
+  - docker build -t adithyashenal/react-static -f Dockerfile.dev .
+
+# if returned any number other than 0, then consider as test failed
+script:
+  - docker run adithyashenal/react-static npm run test # for me no need -- --coverage
